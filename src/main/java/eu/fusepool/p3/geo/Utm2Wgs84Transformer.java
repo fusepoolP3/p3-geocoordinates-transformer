@@ -1,18 +1,26 @@
 package eu.fusepool.p3.geo;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
+import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
+import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.RdfGeneratingTransformer;
@@ -60,15 +68,35 @@ public class Utm2Wgs84Transformer extends RdfGeneratingTransformer {
     
     @Override
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
-        TripleCollection resultGraph = null;
+        TripleCollection enrichedGraph = null;
         String mediaType = entity.getType().toString();   
         Parser parser = Parser.getInstance();
         InputStream is = entity.getData();
-        
-        
+        enrichedGraph = addWgs84Coordinates(is);
             
-        return resultGraph;
+        return enrichedGraph;
         
+    }
+    
+    private TripleCollection addWgs84Coordinates(InputStream is) {
+        TripleCollection resultGraph = null;
+        Parser parser = Parser.getInstance();
+        Model model = ModelFactory.createDefaultModel();
+        // Reads the input rdf data into a Jena model 
+        model.read(is, null, "TURTLE");
+        // Gets a list of subjects of geo:asWKT property
+        HashMap<String,String> pointList = converter.getPointList(model);
+        // Converts the coordinates from UTM to WGS84 
+        HashMap<String,WGS84Point> wgs84Map = converter.convertToWGS84(pointList);
+        // Adds the wgs84:lat wgs84:long properties to the subjects
+        Model enrichedModel = converter.enrichModel(model, wgs84Map);
+        // Copy the rdf data from a Jena model to a Clerezza graph
+        ByteArrayOutputStream osdata = new ByteArrayOutputStream();
+        enrichedModel.write(osdata, "TURTLE");
+        byte[] dataOut = osdata.toByteArray();
+        ByteArrayInputStream isdata = new ByteArrayInputStream(dataOut);
+        resultGraph = parser.parse(isdata, SupportedFormat.TURTLE);
+        return resultGraph;
     }
   
     @Override
