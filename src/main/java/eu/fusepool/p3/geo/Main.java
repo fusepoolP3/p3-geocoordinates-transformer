@@ -23,7 +23,7 @@ import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
 /**
  *
- * @author reto
+ * @author Luigi
  */
 public class Main {
     public static void main(String[] args) throws Exception {
