@@ -17,6 +17,7 @@ import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,11 +72,11 @@ public class Utm2Wgs84Transformer extends RdfGeneratingTransformer {
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
         SimpleMGraph enrichedGraph = new SimpleMGraph();
         String mediaType = entity.getType().toString();   
-        InputStream is = entity.getData();
+        byte[] data = IOUtils.toByteArray(entity.getData()); // save data as an input stream can be read only once.
         Parser parser = Parser.getInstance();
-        TripleCollection inputGraph = parser.parse(is, SupportedFormat.TURTLE);
+        TripleCollection inputGraph = parser.parse(new ByteArrayInputStream(data), SupportedFormat.TURTLE);
         enrichedGraph.addAll(inputGraph);
-        enrichedGraph.addAll(addWgs84Coordinates(is));            
+        enrichedGraph.addAll(addWgs84Coordinates(new ByteArrayInputStream(data)));            
         return enrichedGraph;
         
     }
