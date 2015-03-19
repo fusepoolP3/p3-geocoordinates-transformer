@@ -3,7 +3,7 @@ deploy:
   provider: releases
   api_key:
     secure: o3JzEET4AxZB1UnCHJcV38pfVDgBbviQIISZ0Fun5hN6OKkWMOEwYWuTdiV5CYMQ0TgEz00uZj9R+tlCk1DcoDzmu+iREdnNRDJIXskGqTBfjFe+lkQsLDsYT/ruNwkh8bSVj4WF7fCiF5jjfdaeiLQ+bKWrBeF63GUL37FIgKw=
-  file: target/p3-spatialsearch-demo-$TRAVIS_TAG-jar-with-dependencies.jar
+  file: target/p3-geocoordinates-transformer-$TRAVIS_TAG-jar-with-dependencies.jar
   on:
     repo: fusepoolP3/p3-geocoordinates-transformer
     tags: true
