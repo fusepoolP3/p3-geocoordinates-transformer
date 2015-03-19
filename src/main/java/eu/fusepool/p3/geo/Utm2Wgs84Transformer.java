@@ -14,6 +14,7 @@ import javax.activation.MimeTypeParseException;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.TripleCollection;
+import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.slf4j.Logger;
@@ -68,16 +69,21 @@ public class Utm2Wgs84Transformer extends RdfGeneratingTransformer {
     
     @Override
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
-        TripleCollection enrichedGraph = null;
+        SimpleMGraph enrichedGraph = new SimpleMGraph();
         String mediaType = entity.getType().toString();   
-        Parser parser = Parser.getInstance();
         InputStream is = entity.getData();
-        enrichedGraph = addWgs84Coordinates(is);
-            
+        Parser parser = Parser.getInstance();
+        TripleCollection inputGraph = parser.parse(is, SupportedFormat.TURTLE);
+        enrichedGraph.addAll(inputGraph);
+        enrichedGraph.addAll(addWgs84Coordinates(is));            
         return enrichedGraph;
         
     }
-    
+    /**
+     * Adds WGS84 coordinates to subjects of gs:asWKT property
+     * @param is
+     * @return
+     */
     private TripleCollection addWgs84Coordinates(InputStream is) {
         TripleCollection resultGraph = null;
         Parser parser = Parser.getInstance();
@@ -91,8 +97,19 @@ public class Utm2Wgs84Transformer extends RdfGeneratingTransformer {
         // Adds the wgs84:lat wgs84:long properties to the subjects
         Model enrichedModel = converter.enrichModel(model, wgs84Map);
         // Copy the rdf data from a Jena model to a Clerezza graph
+        resultGraph = jenaModel2ClerezzaTc(enrichedModel);
+        return resultGraph;
+    }
+    /**
+     * Copies a Jena model in a Clerezza triple collection
+     * @param model
+     * @return
+     */
+    private TripleCollection jenaModel2ClerezzaTc(Model model) {
+        TripleCollection resultGraph = null;
+        Parser parser = Parser.getInstance();
         ByteArrayOutputStream osdata = new ByteArrayOutputStream();
-        enrichedModel.write(osdata, "TURTLE");
+        model.write(osdata, "TURTLE");
         byte[] dataOut = osdata.toByteArray();
         ByteArrayInputStream isdata = new ByteArrayInputStream(dataOut);
         resultGraph = parser.parse(isdata, SupportedFormat.TURTLE);
