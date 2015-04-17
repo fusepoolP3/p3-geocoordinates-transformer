@@ -5,6 +5,7 @@ A geocoordinates transformer from UTM (x, y) to WGS84 (lat, long) for POINT geom
 
 [![Build Status](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer)
 
+## Compiling and Running
 Compile the application running the command
 
     mvn install
@@ -13,6 +14,7 @@ Start the application using the command
 
     mvn exec:java
 
+## Usage
 The transformer adds wgs84:lat and wgs84:long properties to the subjects of gs:asWKT property
 where wgs84 is the prefix of the namespace http://www.w3.org/2003/01/geo/wgs84_pos# and gs is the prefix for http://www.opengis.net/ont/geosparql#
 
