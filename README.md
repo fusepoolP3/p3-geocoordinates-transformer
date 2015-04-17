@@ -1,4 +1,4 @@
-Fusepool P3 Geocoordinates Transformer
+Geocoordinates Transformer
 ======================================
 
 A geocoordinates transformer from UTM (x, y) to WGS84 (lat, long) for POINT geometries.
