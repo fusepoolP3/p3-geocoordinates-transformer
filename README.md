@@ -1,9 +1,21 @@
-Geocoordinates Transformer
-======================================
+Geocoordinates Transformer [![Build Status](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer)
+==========================
 
 A geocoordinates transformer from UTM (x, y) to WGS84 (lat, long) for POINT geometries.
 
-[![Build Status](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-geocoordinates-transformer)
+## Try it out
+
+First, obtain the latest [release](https://github.com/fusepoolP3/p3-geocoordinates-transformer/releases/latest).
+
+Next, start the transformer:
+
+    java -jar p3-geocoordinates-transformer-v*-jar-with-dependencies.jar
+
+To obtain the supported input/output-formats of the transformer, query it with the curl-utility:
+
+    curl -X GET -H "ContentType: text/turtle" http://localhost:7100
+
+For advanced testing of the transformer, refer to the section "Usage" just below.
 
 ## Compiling and Running
 Compile the application running the command
